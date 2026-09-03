@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ARSIK SK TIM KERJA</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="https://dms-siasn.bkn.go.id/_astro/dms-logo.D2DCZGbA.png">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===========================
+       RESET
+    ============================ */
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    html,body{
+      width:100%;
+      height:100%;
+      overflow:hidden;
+      background:#f4f7f9; /* Warna dasar soft luxury */
+      font-family:'Poppins',sans-serif;
+    }
+
+    /* ===========================
+       IFRAME
+    ============================ */
+    .app-container{
+      width:100%;
+      height:100%;
+      border:none;
+      display:block;
+      
+      /* Animasi saat iframe muncul */
+      opacity:0;
+      transform: scale(0.95);
+      transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), 
+                  transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .app-container.ready{
+      opacity:1;
+      transform: scale(1);
+    }
+
+    /* ===========================
+       SPLASH SCREEN MEWAH
+    ============================ */
+    .intro-screen{
+      position:fixed;
+      inset:0;
+      /* Background putih bersih dengan gradien sangat halus */
+      background: radial-gradient(circle at 50% 30%, #ffffff 0%, #edf2f7 100%);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+
+      /* Transisi saat menghilang (Zoom In perlahan) */
+      transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0.8s, 
+                  transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .intro-screen.hide{
+      opacity:0;
+      visibility:hidden;
+      transform: scale(1.1); /* Efek maju ke dalam aplikasi */
+      pointer-events: none;
+    }
+
+    .loading-container{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      position: relative;
+    }
+
+    /* Cahaya Pendaran di Belakang Logo (Ambient Glow) */
+    .ambient-glow {
+      position: absolute;
+      top: 20%;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 0;
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Animasi Logo (Lebih Besar & Sinematik) */
+    .logo{
+      width: 170px; /* Ukuran diperbesar */
+      height: 170px;
+      object-fit:contain;
+      z-index: 1;
+      
+      /* Bayangan super lembut */
+      filter: drop-shadow(0px 20px 30px rgba(37, 99, 235, 0.15));
+      
+      /* Animasi masuk (Fade+Blur) disambung Animasi Nafas (Breathing) */
+      animation: cinematicReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                 breathe 4s ease-in-out 1.2s infinite;
+    }
+
+    @keyframes cinematicReveal {
+      0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-5px) scale(1.02); filter: drop-shadow(0px 25px 35px rgba(37, 99, 235, 0.25)); }
+    }
+
+    /* Indikator Loading Minimalis (Garis Mewah) */
+    .loading-line {
+      width: 140px;
+      height: 2px;
+      background: rgba(37, 99, 235, 0.1);
+      margin: 35px 0 20px 0;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      animation: fadeUp 1s ease 0.8s forwards;
+    }
+
+    .loading-line::after {
+      content: '';
+      position: absolute;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      /* Kilauan biru menyapu */
+      background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+      animation: sweep 1.5s ease-in-out infinite;
+    }
+
+    @keyframes sweep {
+      0% { left: -50%; }
+      100% { left: 100%; }
+    }
+
+    /* Animasi Teks Berkilau (Shimmer Text) */
+    .loading-text{
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 5px; /* Spasi lebar agar elegan */
+      text-transform: uppercase;
+      opacity: 0;
+      
+      /* Efek Teks Metalik/Shimmer */
+      background: linear-gradient(90deg, #94a3b8 0%, #334155 50%, #94a3b8 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      
+      animation: shimmerText 2.5s linear infinite, fadeUp 1s ease 1s forwards;
+    }
+
+    @keyframes shimmerText {
+      to { background-position: 200% center; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Splash Screen -->
+  <div id="intro" class="intro-screen">
+      <div class="loading-container">
+          
+          <!-- Ambient Glow (Cahaya di belakang logo) -->
+          <div class="ambient-glow"></div>
+          
+          <!-- Logo -->
+          <img
+              src="https://dms-siasn.bkn.go.id/_astro/dms-logo.D2DCZGbA.png"
+              alt="Logo ARSIK SK TIM KERJA"
+              class="logo">
+
+          <!-- Loading Line Pengganti Titik -->
+          <div class="loading-line"></div>
+
+          <!-- Text -->
+          <div class="loading-text">
+              Memuat Aplikasi
+          </div>
+
+      </div>
+  </div>
+
+  <!-- Google Apps Script -->
+  <iframe
+      id="gas-app"
+      class="app-container"
+      src="https://script.google.com/macros/s/AKfycbyF3cxqpUkJHR314HY4iKm_dEFCHPHcAIPbP0sOnoXjFaNncVUpDBqcqsJSj3wI4i7n/exec"
+      allow="geolocation; microphone; camera; midi; encrypted-media;"
+      sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts">
+  </iframe>
+
+  <script>
+    const iframe = document.getElementById("gas-app");
+    const intro  = document.getElementById("intro");
+
+    let iframeLoaded = false;
+    let minimumTime = false;
+
+    // Minimal splash tampil 3 detik agar animasi mewah sempat dinikmati mata
+    setTimeout(() => {
+        minimumTime = true;
+        hideSplash();
+    }, 3000);
+
+    // Ketika Apps Script selesai dimuat
+    iframe.onload = () => {
+        iframeLoaded = true;
+        hideSplash();
+    };
+
+    // Menghilangkan splash jika kedua syarat terpenuhi
+    function hideSplash(){
+        if(iframeLoaded && minimumTime){
+            // Mulai animasi menghilang untuk intro
+            intro.classList.add("hide");
+            
+            // Mulai animasi muncul untuk iframe
+            iframe.classList.add("ready");
+
+            // Hapus elemen intro dari DOM setelah transisi selesai (800ms)
+            setTimeout(()=>{
+                intro.remove();
+            }, 800);
+        }
+    }
+  </script>
+
+</body>
+</html>
